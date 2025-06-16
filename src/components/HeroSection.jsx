@@ -195,63 +195,9 @@ const CodeforcesTravkerHero = () => {
               </p>
             </div>
 
-            <div className="flex justify-center mb-8">
-              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-1 inline-flex">
-                {['overview', 'students', 'analytics'].map((tab) => (
-                  <button
-                    key={tab}
-                    onClick={() => setActiveTab(tab)}
-                    className={`px-6 py-2 rounded-lg font-medium capitalize transition-all duration-300 ${
-                      activeTab === tab
-                        ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg'
-                        : isDarkMode ? 'text-gray-300 hover:text-white' : 'text-gray-700 hover:text-gray-900'
-                    }`}
-                  >
-                    {tab}
-                  </button>
-                ))}
-              </div>
-            </div>
+            
 
-            <div className="bg-gradient-to-br from-blue-500/10 to-purple-600/10 rounded-xl p-8 border border-white/10">
-              <div className="grid md:grid-cols-3 gap-6">
-                <div className="bg-white/10 rounded-lg p-4">
-                  <div className="flex items-center mb-3">
-                    <Users className="text-blue-400 mr-2" size={20} />
-                    <span className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                      Active Students
-                    </span>
-                  </div>
-                  <div className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                    156
-                  </div>
-                </div>
-                
-                <div className="bg-white/10 rounded-lg p-4">
-                  <div className="flex items-center mb-3">
-                    <TrendingUp className="text-green-400 mr-2" size={20} />
-                    <span className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                      Avg Rating
-                    </span>
-                  </div>
-                  <div className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                    1247
-                  </div>
-                </div>
-                
-                <div className="bg-white/10 rounded-lg p-4">
-                  <div className="flex items-center mb-3">
-                    <Clock className="text-purple-400 mr-2" size={20} />
-                    <span className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                      Last Sync
-                    </span>
-                  </div>
-                  <div className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                    2m ago
-                  </div>
-                </div>
-              </div>
-            </div>
+            
           </div>
 
           {/* CTA Section */}

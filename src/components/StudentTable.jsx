@@ -23,21 +23,26 @@ const StudentTable = () => {
   const [isModalOpen, setModalOpen] = useState(false)
   const [editingStudent, setEditingStudent] = useState(null)
   const [isEditModalOpen, setEditModalOpen] = useState(false)
-  const [loading, setLoading] = useState(true)
+  const [initialLoading, setInitialLoading] = useState(true) // Only for initial load
   const [syncingIds, setSyncingIds] = useState(new Set())
   const [deletingIds, setDeletingIds] = useState(new Set())
+  const [togglingReminderIds, setTogglingReminderIds] = useState(new Set())
   const navigate = useNavigate()
 
-  const fetchStudents = async () => {
+  const fetchStudents = async (showLoader = false) => {
     try {
-      setLoading(true)
+      if (showLoader) {
+        setInitialLoading(true)
+      }
       const res = await api.get('/students')
       console.log('Fetched students:', res.data)
       setStudents(res.data)
     } catch (error) {
       console.error('Error fetching students:', error)
     } finally {
-      setLoading(false)
+      if (showLoader) {
+        setInitialLoading(false)
+      }
     }
   }
 
@@ -46,7 +51,7 @@ const StudentTable = () => {
       try {
         setDeletingIds(prev => new Set([...prev, id]))
         await api.delete(`/students/${id}`)
-        fetchStudents()
+        await fetchStudents() // Don't show loader for this refresh
       } catch (error) {
         console.error('Error deleting student:', error)
       } finally {
@@ -63,7 +68,7 @@ const StudentTable = () => {
     try {
       setSyncingIds(prev => new Set([...prev, id]))
       await api.post(`/students/${id}/sync-now`)
-      fetchStudents()
+      await fetchStudents() // Don't show loader for this refresh
     } catch (error) {
       console.error('Error syncing student:', error)
     } finally {
@@ -77,16 +82,33 @@ const StudentTable = () => {
 
   const toggleReminder = async (id) => {
     try {
+      setTogglingReminderIds(prev => new Set([...prev, id]))
       await api.post(`/students/${id}/toggle-reminder`)
-      fetchStudents()
+      await fetchStudents() // Don't show loader for this refresh
     } catch (error) {
       console.error('Error toggling reminder:', error)
+    } finally {
+      setTogglingReminderIds(prev => {
+        const newSet = new Set(prev)
+        newSet.delete(id)
+        return newSet
+      })
     }
   }
 
   const handleEdit = (student) => {
     setEditingStudent(student)
     setEditModalOpen(true)
+  }
+
+  const handleStudentAdded = () => {
+    fetchStudents() // Refresh without loader
+    setModalOpen(false)
+  }
+
+  const handleStudentUpdated = () => {
+    fetchStudents() // Refresh without loader
+    setEditModalOpen(false)
   }
 
   const getRatingColor = (rating) => {
@@ -134,10 +156,11 @@ const StudentTable = () => {
   }
 
   useEffect(() => { 
-    fetchStudents() 
+    fetchStudents(true) // Show loader only on initial load
   }, [])
 
-  if (loading) {
+  // Show full-screen loader only on initial load
+  if (initialLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
@@ -296,14 +319,17 @@ const StudentTable = () => {
 
                         <button 
                           onClick={() => toggleReminder(student._id)} 
+                          disabled={togglingReminderIds.has(student._id)}
                           title={student.emailReminderDisabled ? "Enable Reminder" : "Disable Reminder"}
-                          className="p-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-all duration-200"
+                          className="p-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-all duration-200 disabled:opacity-50"
                         >
                           <FaEnvelopeOpenText
                             className={`h-4 w-4 transition-all duration-300 ${
-                              !student.emailReminderDisabled 
-                                ? 'text-green-600 hover:scale-110' 
-                                : 'text-gray-400 hover:text-gray-600'
+                              togglingReminderIds.has(student._id) 
+                                ? 'animate-pulse text-gray-400' 
+                                : !student.emailReminderDisabled 
+                                  ? 'text-green-600 hover:scale-110' 
+                                  : 'text-gray-400 hover:text-gray-600'
                             }`}
                           />
                         </button>
@@ -361,13 +387,13 @@ const StudentTable = () => {
           isOpen={isEditModalOpen}
           onClose={() => setEditModalOpen(false)}
           student={editingStudent}
-          onStudentUpdated={fetchStudents}
+          onStudentUpdated={handleStudentUpdated}
         />
 
         <AddStudentModal 
           isOpen={isModalOpen} 
           onClose={() => setModalOpen(false)} 
-          onStudentAdded={fetchStudents} 
+          onStudentAdded={handleStudentAdded} 
         />
       </div>
 

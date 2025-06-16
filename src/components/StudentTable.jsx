@@ -311,7 +311,7 @@ const StudentTable = () => {
                     { label: 'Phone', icon: null },
                     { label: 'CF Handle', icon: null },
                     { label: 'Rating', icon: FaTrophy },
-                    { label: 'Max Rating', icon: FaChartLine },
+                    { label: 'Max Rated Problem', icon: FaChartLine },
                     { label: 'Last Sync', icon: FaClock },
                     { label: 'Actions', icon: null }
                   ].map((header, index) => (
